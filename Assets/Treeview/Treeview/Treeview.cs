@@ -104,8 +104,11 @@ public class Treeview : MonoBehaviour//, ISerializationCallbackReceiver
             return backgroundStyle;
         }
     }
+
     public Rect BackgroundRect
     {
+        
+
         get
         {
             backgroundRect.x = 50;
@@ -280,7 +283,7 @@ public class Treeview : MonoBehaviour//, ISerializationCallbackReceiver
         if (DisplayInGame && SavedDefaultButtonStyle)
         {
             GUILayout.BeginArea(BackgroundRect);
-
+            
             Display();
 
             GUILayout.EndArea();

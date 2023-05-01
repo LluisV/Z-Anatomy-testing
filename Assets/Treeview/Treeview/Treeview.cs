@@ -140,7 +140,7 @@ public class Treeview : MonoBehaviour//, ISerializationCallbackReceiver
         {
             if (root == null)
             {
-                root = new Node("Select Your Level", this);
+                root = new Node("Select",this);
             }
 
             return root;
@@ -199,7 +199,7 @@ public class Treeview : MonoBehaviour//, ISerializationCallbackReceiver
     {
         if (root == null)
         {
-            root = new Node("Select Your Level", this);
+            root = new Node("Select your level", this);
         }
 
         nodeDatas.Add(new NodeData(root));

@@ -34,6 +34,9 @@ public class Node
     public float Height = 20;
     public bool SizeApplied = false;
     public bool IsExpanded = true;
+    private string v;
+    private NodeData v1;
+
     public bool IsParent => Children.Any();
     public bool IsRoot => Parent == null;
     public bool IsSelected => this == Treeview.SelectedNode;
@@ -94,6 +97,13 @@ public class Node
         {
             Parent = new Node(nodeData.ParentId, treeview);
         }
+    }
+
+
+
+    public Node(Treeview treeview)
+    {
+        Treeview = treeview;
     }
     #endregion
 

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 /// <summary>
 /// An example of tree data management logic.
-public static class NodeExtensions
+public static class NodeExtensions1
 {
-    public static Node FindChild(this Node node, string text)
+    public static Node FindChild1(this Node node, string text)
     {
         foreach (Node child in node.Children)
         {
@@ -20,7 +20,7 @@ public static class NodeExtensions
     }
 }
 
-public class TreeviewDataExample : MonoBehaviour
+public class TreeviewDataExample1 : MonoBehaviour
 {
     private const string treeviewComponentNotFound = "Treeview component not found.";
     private const string treeviewDisplayingByEditorDisabled = "Treeview displaying has been disabled in component \"Treeview\".";
@@ -52,7 +52,7 @@ public class TreeviewDataExample : MonoBehaviour
         }
 
         // Read data from CSV file
-        string path = "Assets/Level Selector/UGUI/vertebralsheet.csv";
+        string path = "Assets/Level Selector/UGUI/Cranium.csv";
         List<string[]> data = new List<string[]>();
         using (StreamReader reader = new StreamReader(path))
         {
@@ -74,7 +74,7 @@ public class TreeviewDataExample : MonoBehaviour
 
             for (int i = 0; i < values.Length; i++)
             {
-                node = parentNode.FindChild(values[i]);
+                node = parentNode.FindChild1(values[i]);
                 if (node == null)
                 {
                     node = parentNode.AddChild(values[i]);

@@ -3810,16 +3810,16 @@ MonoBehaviour:
   DisplayInGame: 1
   DisplayInScene: 1
   X: 0
-  Y: 300
+  Y: 320
   Width: 350
-  Height: 200
+  Height: 300
   Padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
   LevelDistance: 0
-  BackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  BackgroundColor: {r: 0, g: 0, b: 0, a: 0}
   NodeMargin:
     m_Left: 0
     m_Right: 0

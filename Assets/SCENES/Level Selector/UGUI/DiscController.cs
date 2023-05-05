@@ -3,6 +3,7 @@ using UnityEngine;
 public class DiscController : MonoBehaviour
 {
     public float rotateSpeed = 100f;
+    public float maxRotationAngle = 45f;
 
     private Vector3 lastMousePosition;
 
@@ -17,21 +18,11 @@ public class DiscController : MonoBehaviour
             float horizontal = (Input.mousePosition.x - lastMousePosition.x) / Screen.width;
 
             // Rotate the object horizontally
-            Quaternion rotation = transform.rotation;
             float angle = horizontal * rotateSpeed * Time.deltaTime;
-            if (angle > 0)
-            {
-                angle = Mathf.Min(angle, 45f);
-            }
-            else if (angle < 0)
-            {
-                angle = Mathf.Max(angle, -45f);
-            }
-            rotation *= Quaternion.Euler(0f, angle, 0f);
-            transform.rotation = rotation;
+            angle = Mathf.Clamp(angle, -maxRotationAngle, maxRotationAngle);
+            transform.Rotate(Vector3.up, angle, Space.Self);
 
             lastMousePosition = Input.mousePosition;
         }
     }
 }
-

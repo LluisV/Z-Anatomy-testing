@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/sample URP scene/URPSampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Level Selector/UGUI/Lvl_Selector.unity
+    path: Assets/SCENES/Level Selector/UGUI/Lvl_Selector.unity
     guid: 2485e3220665d78479d5acb51f3110f4
   - enabled: 1
-    path: Assets/homepage/PlayMenu.unity
+    path: Assets/SCENES/homepage/PlayMenu.unity
     guid: ee85d35e89ba96d40b7e16cc6df0c81f
   m_configObjects: {}

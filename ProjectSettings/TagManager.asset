@@ -3,7 +3,21 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Skeleton
+  - Insertions
+  - BodyParts
+  - Visceral
+  - Muscles
+  - Joints
+  - Arteries
+  - Nervous
+  - Lymph
+  - Veins
+  - References
+  - Fascia
+  - Debug
+  - GlobalParent
   layers:
   - Default
   - TransparentFX
@@ -11,7 +25,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Body
   - 
   - 
   - 

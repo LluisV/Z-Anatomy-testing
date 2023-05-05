@@ -63,7 +63,9 @@ public class TestingLoadCSVData : MonoBehaviour
             {
                 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(10, 0);
                 newButton.GetComponentInChildren<Text>().text = section;
+                newButton.GetComponentInChildren<Text>().fontSize = 10;
                 output =  "\n\n";
                 lastSection = section;
             }
@@ -72,12 +74,13 @@ public class TestingLoadCSVData : MonoBehaviour
             {
                 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(20, 0);
                 newButton.GetComponentInChildren<Text>().text = items[j];
-              
+                newButton.GetComponentInChildren<Text>().fontSize = 8;
             }
         }
 
-        outputText.text = output;
+        
     }
 
     static public string[,] SplitCsvGrid(string csvText)

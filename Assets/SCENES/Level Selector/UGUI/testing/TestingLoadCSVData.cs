@@ -16,16 +16,16 @@ public class TestingLoadCSVData : MonoBehaviour
     //public int itemsFontSize = 18;
     public GameObject buttonPrefab;
     public GameObject buttonParent;
-    
-    
+
+
 
     void Start()
     {
 
-        
+
         string[,] grid = SplitCsvGrid(csvFile.text);
         string output = "";
-        
+
         string lastCategory = "";
         string lastSection = "";
         for (int i = 0; i < grid.GetLength(0); i++)
@@ -47,7 +47,7 @@ public class TestingLoadCSVData : MonoBehaviour
                 {
                     output += "\n";
                 }
-                
+
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 newButton.GetComponentInChildren<Text>().text = category;
                 output = "\n\n";
@@ -56,23 +56,23 @@ public class TestingLoadCSVData : MonoBehaviour
                 lastSection = "";
             }
 
-           
+
 
             if (!string.IsNullOrEmpty(section) && section != lastSection)
 
             {
-                
+
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(10, 0);
                 newButton.GetComponentInChildren<Text>().text = section;
                 newButton.GetComponentInChildren<Text>().fontSize = 10;
-                output =  "\n\n";
+                output = "\n\n";
                 lastSection = section;
             }
 
             for (int j = 0; j < items.Count; j++)
             {
-                
+
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(20, 0);
                 newButton.GetComponentInChildren<Text>().text = items[j];
@@ -80,7 +80,7 @@ public class TestingLoadCSVData : MonoBehaviour
             }
         }
 
-        
+
     }
 
     static public string[,] SplitCsvGrid(string csvText)
@@ -116,7 +116,5 @@ public class TestingLoadCSVData : MonoBehaviour
         return grid;
     }
 
-   
+
 }
-
-

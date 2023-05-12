@@ -11,12 +11,19 @@ public class buttonFunctionalities : MonoBehaviour
         string buttonText = b.GetComponentInChildren<Text>().text;
         if (buttonText == "APPENDICULAR SKELETON")
         {
-            // Load the "modelscene" scene
-            SceneManager.LoadScene("ModelScene");
+            // Change the color of the button text to yellow
+            b.GetComponentInChildren<Text>().color = Color.yellow;
         }
         else
         {
             Debug.Log(buttonText);
         }
     }
+
+    public void onPlayButtonClick()
+    {
+        // Load the "modelscene" scene
+        SceneManager.LoadScene("ModelScene");
+    }
+
 }

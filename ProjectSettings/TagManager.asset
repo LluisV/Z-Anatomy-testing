@@ -18,6 +18,8 @@ TagManager:
   - Fascia
   - Debug
   - GlobalParent
+  - Prefab
+  - Prefabs
   layers:
   - Default
   - TransparentFX

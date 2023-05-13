@@ -227,3 +227,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3b9bf0fff040846b84ac9d77c18632, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  modelLoader: {fileID: 1484161835485455470, guid: c66c97fcd4f0dde4da10986a1408f088,
+    type: 3}
+  muscularSystemPrefab: {fileID: 8880051439834732723, guid: 97441c212bd9e844b89a041865cb2222,
+    type: 3}
+  abdominalPartPrefab: {fileID: 1161079668187372275, guid: d97d6aaa5914ac04cb125f16f154166b,
+    type: 3}

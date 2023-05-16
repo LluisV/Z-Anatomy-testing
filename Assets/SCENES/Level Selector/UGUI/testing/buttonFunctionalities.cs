@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class buttonFunctionalities : MonoBehaviour
 {
@@ -12,19 +13,19 @@ public class buttonFunctionalities : MonoBehaviour
 
     public void onButtonClick(GameObject buttonGameObject)
     {
-        string buttonText = buttonGameObject.GetComponentInChildren<Text>().text;
+        string buttonText = buttonGameObject.GetComponentInChildren<TextMeshProUGUI>().text;
         Debug.Log(buttonText);
 
         // If a button was previously selected, reset its color to its original color
         if (lastSelectedButton != null)
         {
-            lastSelectedButton.GetComponentInChildren<Text>().color = lastSelectedButtonColor;
+            lastSelectedButton.GetComponentInChildren<TextMeshProUGUI>().color = lastSelectedButtonColor;
         }
 
         // Set the color of the current button to yellow
         Button currentButton = buttonGameObject.GetComponent<Button>();
-        lastSelectedButtonColor = currentButton.GetComponentInChildren<Text>().color;
-        currentButton.GetComponentInChildren<Text>().color = Color.yellow;
+        lastSelectedButtonColor = currentButton.GetComponentInChildren<TextMeshProUGUI>().color;
+        currentButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
 
         // Store the selected button's text in PlayerPrefs
         PlayerPrefs.SetString("SelectedButton", buttonText);

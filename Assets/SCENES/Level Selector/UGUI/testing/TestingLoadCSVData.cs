@@ -8,12 +8,10 @@ using System.Collections.Generic;
 public class TestingLoadCSVData : MonoBehaviour
 {
     public TextAsset csvFile; // Assign the CSV file to this variable in the Inspector
-    public TextMeshProUGUI outputText;
+    
     // Assign the Text field to this variable in the Inspector
 
-    //public int categoryFontSize = 24;
-    //public int sectionFontSize = 20;
-    //public int itemsFontSize = 18;
+    
     public GameObject buttonPrefab;
     public GameObject buttonParent;
 
@@ -49,8 +47,9 @@ public class TestingLoadCSVData : MonoBehaviour
                 }
 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponentInChildren<Text>().text = category;
-                output = "\n\n";
+                newButton.GetComponentInChildren<TextMeshProUGUI>().text = category;
+                newButton.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold | FontStyles.Underline;
+                
 
                 lastCategory = category;
                 lastSection = "";
@@ -63,10 +62,10 @@ public class TestingLoadCSVData : MonoBehaviour
             {
 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(10, 0);
-                newButton.GetComponentInChildren<Text>().text = section;
-                newButton.GetComponentInChildren<Text>().fontSize = 10;
-                output = "\n\n";
+                newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(5, 0);
+                newButton.GetComponentInChildren<TextMeshProUGUI>().text = section;
+                newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = 10;
+                
                 lastSection = section;
             }
 
@@ -74,9 +73,10 @@ public class TestingLoadCSVData : MonoBehaviour
             {
 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponentInChildren<Text>().GetComponent<RectTransform>().offsetMin += new Vector2(20, 0);
-                newButton.GetComponentInChildren<Text>().text = items[j];
-                newButton.GetComponentInChildren<Text>().fontSize = 8;
+                newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(7, 0);
+                newButton.GetComponentInChildren<TextMeshProUGUI>().text = items[j];
+                newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = 8;
+                newButton.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.LowerCase;
             }
         }
 

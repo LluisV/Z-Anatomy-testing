@@ -5,15 +5,15 @@ using System.IO;
 using TMPro;
 using System.Collections.Generic;
 
-
 public class TestingLoadCSVData : MonoBehaviour
 {
-    public static TestingLoadCSVData Instance;
-
-    [SerializeField]
-    private TextAsset csvFile; // Assign the CSV file to this variable in the Inspector
+    public TextAsset skeletonCSV;
+    public TextAsset muscularCSV;
+    public TextAsset nervousCSV;
     [SerializeField]
     private GameObject buttonPrefab;
+    public static TestingLoadCSVData Instance;
+
     [SerializeField]
     private GameObject buttonParent;
     [Range(5, 15)]
@@ -37,6 +37,8 @@ public class TestingLoadCSVData : MonoBehaviour
     [HideInInspector]
     public Button lastSelectedButton;
 
+
+    public TMP_Text tmpText; // Assign the TMP_Text field in the Inspector
     private void Awake()
     {
         if (Instance == null)
@@ -44,74 +46,112 @@ public class TestingLoadCSVData : MonoBehaviour
             Instance = this;
         }
         buttonParent.GetComponent<VerticalLayoutGroup>().spacing = verticalSpacing;
-    }
 
+    }
 
     void Start()
     {
+        UpdateData();
+    }
 
-        string[,] grid = SplitCsvGrid(csvFile.text);
-
-        string lastCategory = "";
-        string lastSection = "";
-        for (int i = 0; i < grid.GetLength(0); i++)
+    public void UpdateData()
+    {
+        if (tmpText != null)
         {
-            string category = grid[i, 0];
-            string section = grid[i, 1];
-            List<string> items = new List<string>();
-            for (int j = 2; j < grid.GetLength(1); j++)
+            string selectedText = tmpText.text;
+            TextAsset selectedCSV = GetSelectedCSV(selectedText);
+
+            if (selectedCSV != null)
             {
-                if (!string.IsNullOrEmpty(grid[i, j]))
+                ClearButtons();
+
+                string[,] grid = SplitCsvGrid(selectedCSV.text);
+                string output = "";
+
+                string lastCategory = "";
+                string lastSection = "";
+                for (int i = 0; i < grid.GetLength(0); i++)
                 {
-                    items.Add(grid[i, j]);
+                    string category = grid[i, 0];
+                    string section = grid[i, 1];
+                    List<string> items = new List<string>();
+                    for (int j = 2; j < grid.GetLength(1); j++)
+                    {
+                        if (!string.IsNullOrEmpty(grid[i, j]))
+                        {
+                            items.Add(grid[i, j]);
+                        }
+                    }
+
+                    if (category != lastCategory)
+                    {
+                        if (output != "")
+                        {
+                            output += "\n";
+                        }
+
+                        GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().text = category;
+                        newButton.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold | FontStyles.Underline;
+
+                        lastCategory = category;
+                        lastSection = "";
+                    }
+
+                    if (!string.IsNullOrEmpty(section) && section != lastSection)
+                    {
+                        GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(5, 0);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().text = section;
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = 12;
+
+                        lastSection = section;
+                    }
+
+                    for (int j = 0; j < items.Count; j++)
+                    {
+                        GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(8, 0);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().text = items[j];
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = 12;
+                    }
                 }
             }
-
-            if (category != lastCategory)
+            else
             {
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<RectTransform>().SetHeight(categoryTextSize);
-                newButton.GetComponentInChildren<TextMeshProUGUI>().text = category;
-                newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = categoryTextSize;
-                newButton.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold | FontStyles.Underline;
-
-                lastCategory = category;
-                lastSection = "";
+                Debug.LogError("No CSV file found for the selected text: " + selectedText);
             }
-
-
-
-            if (!string.IsNullOrEmpty(section) && section != lastSection)
-            {
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<RectTransform>().SetHeight(textSize);
-                newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(5, 0);
-                newButton.GetComponentInChildren<TextMeshProUGUI>().text = section;
-                newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = textSize;
-
-                lastSection = section;
-            }
-
-            for (int j = 0; j < items.Count; j++)
-            {
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<RectTransform>().SetHeight(textSize);
-                newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(5 + horizontalSpacing, 0);
-                newButton.GetComponentInChildren<TextMeshProUGUI>().text = items[j];
-                newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = textSize;  
-            }
-
-            if (!string.IsNullOrEmpty(section))
-                AddSpacing();
+        }
+        else
+        {
+            Debug.LogError("TMP_Text field not assigned.");
         }
     }
 
-    private void AddSpacing()
+    private TextAsset GetSelectedCSV(string selectedText)
     {
-        GameObject newSpacing = new GameObject();
-        newSpacing.name = "Spacing";
-        newSpacing.transform.SetParent(buttonParent.transform);
-        newSpacing.AddComponent<RectTransform>().SetHeight(spaceBetweenSections);
+        switch (selectedText)
+        {
+            case "Skeleton":
+                return skeletonCSV;
+            case "Muscular":
+                return muscularCSV;
+            case "Nervous":
+                return nervousCSV;
+            case "Select System":
+                return null; // No CSV file for the initial "Select System" text
+            default:
+                return null;
+        }
+    }
+    private void ClearButtons()
+    {
+        // Destroy all existing buttons
+        Button[] buttons = buttonParent.GetComponentsInChildren<Button>();
+        foreach (Button button in buttons)
+        {
+            Destroy(button.gameObject);
+        }
     }
 
     static public string[,] SplitCsvGrid(string csvText)
@@ -146,4 +186,6 @@ public class TestingLoadCSVData : MonoBehaviour
         }
         return grid;
     }
+
+
 }

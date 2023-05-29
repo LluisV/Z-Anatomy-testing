@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ModelScene : MonoBehaviour
 {
     public GameObject prefabContainer;
-    public Text selectedText;
+    public TextMeshProUGUI selectedText;
+
     public GameObject modelObject;
 
     // Start is called before the first frame update
@@ -15,8 +17,11 @@ public class ModelScene : MonoBehaviour
         // Get the selected button text from PlayerPrefs
         string selectedButton = PlayerPrefs.GetString("SelectedButton");
 
+        // Convert the selectedText to a TextMeshProUGUI component
+        TextMeshProUGUI selectedTextTMP = selectedText.GetComponent<TextMeshProUGUI>();
+
         // Set the text to the selected button text
-        selectedText.text = selectedButton;
+        selectedTextTMP.text = selectedButton;
 
         // Load the "skeleton" prefab
         GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Skeleton");
@@ -51,6 +56,7 @@ public class ModelScene : MonoBehaviour
             Debug.LogError("Could not load skeleton prefab");
         }
     }
+
 
     // Helper method to recursively search for a GameObject with a specific text in the hierarchy
     private Transform FindGameObjectInChildren(Transform parent, string searchText)

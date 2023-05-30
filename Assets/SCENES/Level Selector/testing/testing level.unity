@@ -2104,7 +2104,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.0793037, y: 0.02838861}
   m_AnchorMax: {x: 1, y: 0.75184715}
-  m_AnchoredPosition: {x: -1.3803024, y: 1.0626831}
+  m_AnchoredPosition: {x: -1.3803024, y: 1.0626221}
   m_SizeDelta: {x: 2.7605, y: 1.4744}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1085895972
@@ -3742,8 +3742,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1090592684}
   m_HandleRect: {fileID: 1090592683}
   m_Direction: 0
-  m_Value: 0.0000002414682
-  m_Size: 0.792814
+  m_Value: 0.0000002414681
+  m_Size: 0.79281396
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4508,11 +4508,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4264cfebe0d7d540a80812a91f5d7b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  csvFile: {fileID: 4900000, guid: 76bc56440292cc24c82b229b272a54f3, type: 3}
+  skeletonCSV: {fileID: 0}
+  muscularCSV: {fileID: 0}
+  nervousCSV: {fileID: 0}
   buttonPrefab: {fileID: 3710582253812159385, guid: ecfb6e81eaaecee43bdf7cd017360feb,
     type: 3}
   buttonParent: {fileID: 91579999}
+  textSize: 10
+  categoryTextSize: 15
+  horizontalSpacing: 3
+  verticalSpacing: 0
+  spaceBetweenSections: 0
   flag: 0
+  lastSelectedButton: {fileID: 0}
+  tmpText: {fileID: 0}
 --- !u!1 &2033723023
 GameObject:
   m_ObjectHideFlags: 0

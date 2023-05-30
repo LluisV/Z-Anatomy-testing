@@ -59,25 +59,69 @@ public class ModelScene : MonoBehaviour
 
 
     // Helper method to recursively search for a GameObject with a specific text in the hierarchy
+    // Helper method to recursively search for a GameObject with a specific text in the hierarchy
     private Transform FindGameObjectInChildren(Transform parent, string searchText)
     {
-        if (parent.name == searchText)
+        // Try to find an exact match
+        Transform result = FindChildByName(parent, searchText);
+        if (result != null)
         {
-            return parent;
+            return result;
         }
 
-        for (int i = 0; i < parent.childCount; i++)
+        // Try adding ".g" and search again
+        result = FindChildByName(parent, searchText + ".g");
+        if (result != null)
         {
-            Transform child = parent.GetChild(i);
-            Transform result = FindGameObjectInChildren(child, searchText);
-            if (result != null)
+            return result;
+        }
+
+        // Try adding ".l" and search again
+        result = FindChildByName(parent, searchText + ".l");
+        if (result != null)
+        {
+            return result;
+        }
+
+        // Perform a breadth-first search
+        Queue<Transform> queue = new Queue<Transform>();
+        queue.Enqueue(parent);
+
+        while (queue.Count > 0)
+        {
+            Transform current = queue.Dequeue();
+
+            // Check if the current transform name contains the search text
+            if (current.name.Contains(searchText))
             {
-                return result;
+                return current;
+            }
+
+            for (int i = 0; i < current.childCount; i++)
+            {
+                Transform child = current.GetChild(i);
+                queue.Enqueue(child);
             }
         }
 
         return null;
     }
+
+
+    // Helper method to find a child GameObject by name
+    private Transform FindChildByName(Transform parent, string name)
+    {
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            if (child.name == name)
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+
 
 
 

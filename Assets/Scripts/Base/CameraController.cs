@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -98,14 +99,15 @@ public class CameraController : MonoBehaviour
 
         defaultTarget = target;
         cameraCenter = new GameObject().transform;
-        cameraCenter.position = defaultCenter.transform.position;
+        if (defaultCenter != null)
+            cameraCenter.position = defaultCenter.transform.position;
         eventSys = EventSystem.current;
         distance = defaulDistance;
         lastMousePosition = cameraCenter.position;
-        pivot = defaultCenter.transform.position;
+        if (defaultCenter != null)
+            pivot = defaultCenter.transform.position;
 
         trans = transform;
-
     }
 
 
@@ -369,12 +371,14 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public void CenterImmediate()
     {
-        SelectedObjectsManagement.Instance.GetActiveObjects();
+        UpdateBounds();
 
         float newDistance = bounds.extents.magnitude;
         if (newDistance > defaulDistance)
             newDistance = defaulDistance;
         distance = newDistance;
+        cameraCenter.position = bounds.center;
+        pivot = bounds.center;
 
         if (ActionControl.limitRotation)
             y = ClampAngle(y, yMinLimit, yMaxLimit);
@@ -390,83 +394,23 @@ public class CameraController : MonoBehaviour
     /// <param name="updateDistance">Whether to update the camera distance or not.</param>
     public void CenterView(bool updateDistance)
     {
-        SelectedObjectsManagement.Instance.GetActiveObjects();
-        if (SelectedObjectsManagement.Instance.activeObjects.Count == 0)
-            return;
+        UpdateBounds();
+
         if (lerpPosCoroutine != null)
             StopCoroutine(lerpPosCoroutine);
 
-        //No objets selected-> center is the medium point of all active objects
-        if (SelectedObjectsManagement.Instance.selectedObjects.Count == 0)// && SelectedObjectsManagement.instance.deletedObjects.Count > 0)
-        {
-            if (bounds.extents.magnitude == 0)
-                return;
+        if (bounds.extents.magnitude == 0)
+            return;
 
-            SetTarget(null);
+        float newDistance = bounds.extents.magnitude * 1.12f;
+        cameraCenter.position = bounds.center;
+        pivot = bounds.center;
 
-            float newDistance = bounds.extents.magnitude * 1.25f;
-            cameraCenter.position = bounds.center;
-            pivot = bounds.center;
-
-            if (newDistance > defaulDistance)
-                newDistance = defaulDistance;
-            if (updateDistance)
-                UpdateCameraPos(newDistance);
-            else
-                UpdateCameraPos(distance);
-        }
-        else if (SelectedObjectsManagement.Instance.selectedObjects.Count == 1)
-        {
-            TangibleBodyPart script = SelectedObjectsManagement.Instance.selectedObjects[0].GetComponent<TangibleBodyPart>();
-            Label labelScript = SelectedObjectsManagement.Instance.selectedObjects[0].GetComponent<Label>();
-
-            if (script == null && labelScript == null)
-                return;
-
-            float newDistance;
-
-            if (labelScript == null)
-            {
-                newDistance = script.distanceToCamera;
-                if (newDistance == 0)
-                    return;
-                cameraCenter.position = script.center;
-                pivot = script.center;
-            }
-            else
-            {
-                newDistance = labelScript.parent.distanceToCamera;
-                if (newDistance == 0)
-                    return;
-                cameraCenter.position = labelScript.transform.position;
-                pivot = labelScript.parent.center;
-            }
-
-            if (newDistance > defaulDistance)
-                newDistance = defaulDistance;
-            if (updateDistance)
-                UpdateCameraPos(newDistance);
-            else
-                UpdateCameraPos(distance);
-        }
-        //Some objects selected -> the center is the medium point of all selected objects
+        if (updateDistance)
+            UpdateCameraPos(newDistance);
         else
-        {
-            //Calculate bounds for all objects
-            Bounds bounds = StaticMethods.GetBounds(SelectedObjectsManagement.Instance.selectedObjects);
-
-            if (bounds.extents.magnitude == 0)
-                return;
-
-            float newDistance = bounds.extents.magnitude * 1.12f;
-            cameraCenter.position = bounds.center;
-            pivot = bounds.center;
-
-            if (updateDistance)
-                UpdateCameraPos(newDistance);
-            else
-                UpdateCameraPos(distance);
-        }
+            UpdateCameraPos(distance);
+        
 
         rotationOffset = new Vector3();
     }
@@ -486,7 +430,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public void UpdateBounds()
     {
-        bounds = StaticMethods.GetBounds(SelectedObjectsManagement.Instance.activeObjects);
+        bounds = StaticMethods.GetBounds(GlobalVariables.Instance.allBodyParts.Where(it => it.gameObject.activeInHierarchy).Select(it => it.gameObject).ToList());
     }
 
     /// <summary>

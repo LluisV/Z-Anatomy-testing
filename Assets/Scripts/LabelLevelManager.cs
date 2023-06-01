@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEditor.PackageManager;
 using static UnityEngine.GraphicsBuffer;
 using System.Linq;
+using UnityEditor;
 
 public class LabelLevelManager : MonoBehaviour
 {
@@ -14,15 +15,19 @@ public class LabelLevelManager : MonoBehaviour
     public GameObject tangibleBodyPart;
     public int deadline;
     public float hintTime;
-    public Slider time_slider;
-    public TextMeshProUGUI target_text;
-    public TextMeshProUGUI errors_text;
 
+    private Slider time_slider;
     private List<LabelCollider> targets = new List<LabelCollider>();
     private LabelCollider current_target;
+    private int indexOfTarget = 0;
     private Coroutine target_change_coroutine;
     private int errors = 0;
     public Light hint_light;
+
+    public GameObject cardPrefab;
+    public Transform scrollView;
+
+    private List<GameObject> cards = new List<GameObject>();
 
     bool playing = false;
 
@@ -30,24 +35,27 @@ public class LabelLevelManager : MonoBehaviour
     {
         Instance = this;
         targets = tangibleBodyPart.GetComponentsInChildren<LabelCollider>().ToList();
+        //Instantiate a label card for each target
+        foreach (var target in targets)
+        {
+            GameObject newCard = Instantiate(cardPrefab, scrollView);
+            newCard.GetComponentInChildren<TextMeshProUGUI>().text = target.name;
+            //newCard.GetComponentInChildren<Slider>().gameObject.SetActive(false);
+            cards.Add(newCard);
+        }
+        
     }
 
     private IEnumerator Start()
     {
+        GlobalVariables.Instance.globalParent = tangibleBodyPart;
+        GlobalVariables.Instance.GetScripts();
+        yield return new WaitUntil(() => tangibleBodyPart.GetComponent<TangibleBodyPart>().initialized);
+        CameraController.instance.SetTarget(tangibleBodyPart);
+        CameraController.instance.CenterImmediate();
         foreach (var target in targets)
             target.gameObject.SetActive(false);
-        time_slider.maxValue = deadline;
-        time_slider.value = deadline;
-        target_text.text = "5";
-        yield return new WaitForSeconds(1);
-        target_text.text = "4";
-        yield return new WaitForSeconds(1);
-        target_text.text = "3";
-        yield return new WaitForSeconds(1);
-        target_text.text = "2";
-        yield return new WaitForSeconds(1);
-        target_text.text = "1";
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(deadline);
         foreach (var target in targets)
         {
             target.label.Hide();
@@ -114,35 +122,29 @@ public class LabelLevelManager : MonoBehaviour
             if (target_change_coroutine != null)
                 StopCoroutine(target_change_coroutine);
 
-            // Select a target that is not the previous target
-            var prev_target = current_target;
-            if (targets.Count == 1)
-                current_target = targets[0];
-            else
-            {
-                do
-                    current_target = targets[Random.Range(0, targets.Count)];
-                while (current_target == prev_target);
-            }
+            if(indexOfTarget != 0)
+                cards[indexOfTarget-1].transform.SetSiblingIndex(cards.Count - 1);
+            current_target = targets[0];
+            time_slider = cards[indexOfTarget].GetComponentInChildren<Slider>();
+            indexOfTarget++;
 
             current_target.gameObject.SetActive(true);
-            target_text.text = current_target.gameObject.name;
-            time_slider.value = deadline;
             target_change_coroutine = StartCoroutine(ChangeTargetPeriodically());
         }
         else
         {
             if (target_change_coroutine != null)
                 StopCoroutine(target_change_coroutine);
-            target_text.text = "Completed!";
             playing = false;
         }
+
+        time_slider.maxValue = deadline;
+        time_slider.value = deadline;
     }
 
     private void HandleError()
     {
         errors++;
-        errors_text.text = "Errors: " + errors;
     }
 
     private IEnumerator ChangeTargetPeriodically()

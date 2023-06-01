@@ -12,6 +12,7 @@ using System;
 using Random = UnityEngine.Random;
 using Unity.Mathematics;
 using Mono.Cecil.Cil;
+using UnityEditor;
 
 public class LabelCollider : MonoBehaviour
 {
@@ -67,6 +68,8 @@ public class LabelCollider : MonoBehaviour
     private MeshCollider mc;
     private MeshRenderer mr;
     private Vector3 planeNormal = Vector3.zero;
+    [HideInInspector]
+    public string savePath;
 
     public void Build()
     {
@@ -80,6 +83,7 @@ public class LabelCollider : MonoBehaviour
         tangibleBodyPart = label.parent;
         transform.SetParent(parent);
         planeNormal = label.line.outDir;
+        savePath = "Assets/Prefabs/Label Prefabs/Meshes/" + name + ".asset";
         BuildMesh();
     }
 
@@ -334,7 +338,13 @@ public class LabelCollider : MonoBehaviour
 
         // Set a random color for the mesh
         // Assign the new mesh to a MeshFilter component on a new GameObject
-        mf.mesh = intersectingMesh;
+
+
+        Debug.Log("Saved Mesh to:" + savePath);
+        AssetDatabase.CreateAsset(intersectingMesh, savePath);
+
+        mf.sharedMesh = intersectingMesh;
+        mf.sharedMesh.name = name;
         UpdateMaterial();
         if (mc == null)
             mc = gameObject.AddComponent<MeshCollider>();
@@ -358,6 +368,8 @@ public class LabelCollider : MonoBehaviour
             randomColor = new Color(Random.value, Random.value, Random.value);
         randomColor.a = debug ? 1 : 0;
         mat.color = randomColor;
+        if(mr == null)
+            mr = GetComponent<MeshRenderer>();
         mr.sharedMaterial = mat;
         mr.shadowCastingMode = ShadowCastingMode.Off;
     }

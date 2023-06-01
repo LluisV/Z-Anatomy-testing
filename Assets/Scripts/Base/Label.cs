@@ -333,13 +333,26 @@ public class Label : MonoBehaviour
 
     public void DestroyMeshClick()
     {
-        if (colliderGo != null)
+        if (clickableLabelsParent == null)
+            clickableLabelsParent = parent.transform.Find("---------LABEL MESHES---------");
+        if(clickableLabelsParent != null)
         {
-            EditorApplication.delayCall += () =>
+            if (colliderGo == null)
+                colliderGo = clickableLabelsParent.Find(name + ".col").gameObject;
+            if (colliderGo != null)
             {
-                DestroyImmediate(colliderGo);
-            };
+                EditorApplication.delayCall += () =>
+                {
+                    DestroyImmediate(colliderGo);
+                    AssetDatabase.DeleteAsset(lc.savePath);
+                };
+            }
+            else
+            {
+                Debug.Log("Collider not found");
+            }
         }
+
     }
 
     public void ResetValuesClick()

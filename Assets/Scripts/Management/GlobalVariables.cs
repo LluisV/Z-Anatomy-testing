@@ -84,8 +84,12 @@ public class GlobalVariables : MonoBehaviour
     {
         Instance = this;
         Build();
+        GetScripts();
+    }
 
-        if(globalParent != null)
+    public void GetScripts()
+    {
+        if (globalParent != null)
         {
             allNameScripts = globalParent.GetComponentsInChildren<NameAndDescription>(true).ToList();
             allBodyPartRenderers = globalParent.GetComponentsInChildren<MeshRenderer>(true).Where(it => it.GetComponent<Label>() == null && it.GetComponent<Line>() == null && !it.gameObject.name.Contains(".g")).ToList();

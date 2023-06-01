@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class ModelScene : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class ModelScene : MonoBehaviour
     public TextMeshProUGUI selectedText;
 
     public GameObject modelObject;
+
+    [Header("DEBUG OPTIONS")]
+    public bool debug = false;
+    public string structureName;
 
     // Start is called before the first frame update
     void Start()
@@ -20,16 +25,22 @@ public class ModelScene : MonoBehaviour
         // Convert the selectedText to a TextMeshProUGUI component
         TextMeshProUGUI selectedTextTMP = selectedText.GetComponent<TextMeshProUGUI>();
 
-        // Set the text to the selected button text
-        selectedTextTMP.text = selectedButton;
-
         // Load the "skeleton" prefab
-        GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Skeleton");
+        GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Human Body");
 
         if (skeletonPrefab != null)
         {
-            // Search for the corresponding GameObject with the selectedButton text inside the "skeleton" prefab
-            Transform targetTransform = FindGameObjectInChildren(skeletonPrefab.transform, selectedButton);
+            Transform targetTransform;
+            if (debug)
+            {
+                selectedTextTMP.text = structureName;
+                targetTransform = FindGameObjectInChildren(skeletonPrefab.transform, structureName);
+            }
+            else
+            {
+                selectedTextTMP.text = selectedButton;
+                targetTransform = FindGameObjectInChildren(skeletonPrefab.transform, selectedButton);
+            }
 
             if (targetTransform != null)
             {
@@ -45,6 +56,25 @@ public class ModelScene : MonoBehaviour
                 // Scale the model to fit the prefabContainer
                 float scaleFactor = GetScaleFactor(prefabContainer, model);
                 model.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+                // Center the camera
+                StartCoroutine(waitToCenter());
+                IEnumerator waitToCenter()
+                {
+                    // Get all the info of the loaded model
+                    GlobalVariables.Instance.globalParent = prefabContainer.transform.GetChild(0).gameObject;
+                    GlobalVariables.Instance.GetScripts();
+
+                    // Wait until all models are initializated
+                    TangibleBodyPart[] bodyParts = model.GetComponents<TangibleBodyPart>();
+                    yield return new WaitUntil(() => bodyParts.All(it => it.initialized));
+
+                    // Center the camera
+                    CameraController camScript = Camera.main.GetComponent<CameraController>();
+                    camScript.SetTarget(model);
+                    camScript.CenterImmediate();
+                }
+
             }
             else
             {

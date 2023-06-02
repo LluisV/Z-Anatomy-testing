@@ -10,8 +10,6 @@ public class ModelScene : MonoBehaviour
     public GameObject prefabContainer;
     public TextMeshProUGUI selectedText;
 
-    public GameObject modelObject;
-
     [Header("DEBUG OPTIONS")]
     public bool debug = false;
     public string structureName;
@@ -46,9 +44,6 @@ public class ModelScene : MonoBehaviour
             {
                 // Instantiate the corresponding GameObject in the container
                 GameObject model = Instantiate(targetTransform.gameObject, prefabContainer.transform);
-
-                // Set the reference to the model GameObject
-                modelObject = model;
 
                 // Set the parent of the model to the ModelScene GameObject
                 model.transform.SetParent(prefabContainer.transform);

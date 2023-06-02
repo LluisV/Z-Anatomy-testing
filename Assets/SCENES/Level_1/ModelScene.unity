@@ -4186,8 +4186,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabContainer: {fileID: 1324497257}
   selectedText: {fileID: 689929586}
-  debug: 1
-  structureName: Frontal bone
+  debug: 0
+  structureName: 
 --- !u!1 &1874949731
 GameObject:
   m_ObjectHideFlags: 0

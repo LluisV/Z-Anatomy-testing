@@ -111,7 +111,7 @@ public class TestingLoadCSVData : MonoBehaviour
                     for (int j = 0; j < items.Count; j++)
                     {
                         GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                        newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(8, 0);
+                        newButton.GetComponentInChildren<TextMeshProUGUI>().GetComponent<RectTransform>().offsetMin += new Vector2(5, 0);
                         newButton.GetComponentInChildren<TextMeshProUGUI>().text = items[j];
                         newButton.GetComponentInChildren<TextMeshProUGUI>().fontSize = 12;
                     }

@@ -35,6 +35,30 @@ public static class StaticMethods
         return null;
     }
 
+    public static Transform RecursiveFindChildRaw(this Transform parent, string childName)
+    {
+        childName = childName.ToLower();
+        foreach (Transform child in parent)
+        {
+            string childN = child.name.ToLower();
+
+            if (childN == childName)
+            {
+                return child;
+            }
+            else
+            {
+                Transform found = child.RecursiveFindChildRaw(childName);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static string RemovePunctuations(this string input)
     {
         return Regex.Replace(input, "[\"(),./:;\\[\\]{}]", string.Empty);
@@ -227,6 +251,11 @@ public static class StaticMethods
     public static bool IsLabel(this GameObject go)
     {
         return go != null && go.GetComponent<Label>() != null;
+    }
+
+    public static bool IsLine(this GameObject go)
+    {
+        return go != null && go.GetComponent<Line>() != null;
     }
 
     public static bool IsGroup(this GameObject go)

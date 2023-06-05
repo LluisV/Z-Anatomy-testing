@@ -94,7 +94,7 @@ public class GlobalVariables : MonoBehaviour
             allNameScripts = globalParent.GetComponentsInChildren<NameAndDescription>(true).ToList();
             allBodyPartRenderers = globalParent.GetComponentsInChildren<MeshRenderer>(true).Where(it => it.GetComponent<Label>() == null && it.GetComponent<Line>() == null && !it.gameObject.name.Contains(".g")).ToList();
             allVisibilityScripts = globalParent.GetComponentsInChildren<BodyPartVisibility>(true).ToList();
-            allBodyParts = globalParent.GetComponentsInChildren<TangibleBodyPart>(true).ToList();
+            allBodyParts = globalParent.GetComponentsInChildren<TangibleBodyPart>(true).Where(it => it != null).ToList();
 
             bones = allBodyParts.Where(it => it.CompareTag("Skeleton")).ToList();
             insertions = allBodyParts.Where(it => it.CompareTag("Insertions")).ToList();

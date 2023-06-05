@@ -4,178 +4,107 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using System;
+using UnityEngine.UIElements;
 
 public class ModelScene : MonoBehaviour
 {
+    public static ModelScene Instance;
+
     public GameObject prefabContainer;
     public TextMeshProUGUI selectedText;
+    public Dictionary<string, GameObject> targets = new Dictionary<string, GameObject>();
 
-    [Header("DEBUG OPTIONS")]
-    public bool debug = false;
-    public string structureName;
+    [Header("Debug options")]
+    public bool DEBUG = false;
+    public string levelName = string.Empty;
+    public string bodypartNames;
+    public bool bothSides = true;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        // Get the selected button text from PlayerPrefs
-        string selectedButton = PlayerPrefs.GetString("SelectedButton");
+        Instance = this;
+
+        List<string> receivedList = bodypartNames.Split(',').ToList();
+
+        if(!DEBUG)
+        {
+            // Get all the name of all the bodyparts of this level
+            string jsonString = PlayerPrefs.GetString("BodypartList");
+            receivedList = JsonUtility.FromJson<List<string>>(jsonString);
+            // Get the level name
+            levelName = PlayerPrefs.GetString("LevelName");
+        }
 
         // Convert the selectedText to a TextMeshProUGUI component
         TextMeshProUGUI selectedTextTMP = selectedText.GetComponent<TextMeshProUGUI>();
+        selectedTextTMP.text = levelName;
 
         // Load the "skeleton" prefab
-        GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Human Body");
+        GameObject globalParent = Resources.Load<GameObject>("Prefabs/Skeleton");
 
-        if (skeletonPrefab != null)
+        if (globalParent != null)
         {
-            Transform targetTransform;
-            if (debug)
+            foreach (string bodypart in receivedList)
             {
-                selectedTextTMP.text = structureName;
-                targetTransform = FindGameObjectInChildren(skeletonPrefab.transform, structureName);
-            }
-            else
-            {
-                selectedTextTMP.text = selectedButton;
-                targetTransform = FindGameObjectInChildren(skeletonPrefab.transform, selectedButton);
-            }
+                bool left = false;
+                Transform targetTransform;
+                targetTransform = globalParent.transform.RecursiveFindChildRaw(bodypart);
 
-            if (targetTransform != null)
-            {
-                // Instantiate the corresponding GameObject in the container
-                GameObject model = Instantiate(targetTransform.gameObject, prefabContainer.transform);
-
-                // Set the parent of the model to the ModelScene GameObject
-                model.transform.SetParent(prefabContainer.transform);
-
-                // Scale the model to fit the prefabContainer
-                float scaleFactor = GetScaleFactor(prefabContainer, model);
-                model.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-
-                // Center the camera
-                StartCoroutine(waitToCenter());
-                IEnumerator waitToCenter()
+                // It is null, let's try adding .l
+                if(targetTransform == null)
                 {
-                    // Get all the info of the loaded model
-                    GlobalVariables.Instance.globalParent = prefabContainer.transform.GetChild(0).gameObject;
-                    GlobalVariables.Instance.GetScripts();
+                    targetTransform = globalParent.transform.RecursiveFindChildRaw(bodypart + ".l");
+                    left = targetTransform != null;
+                }
+                // It is null let's try adding .g
+                if (targetTransform == null)
+                    targetTransform = globalParent.transform.RecursiveFindChildRaw(bodypart + ".g");
+                // It is null
+                if (targetTransform == null)
+                    throw new Exception("Something went wrong loading " + bodypart + ". Check the names");
 
-                    // Wait until all models are initializated
-                    TangibleBodyPart[] bodyParts = model.GetComponents<TangibleBodyPart>();
-                    yield return new WaitUntil(() => bodyParts.All(it => it.initialized));
+                // Only body parts (not labels, lines, etc)
+                if (targetTransform.gameObject.IsLabel())
+                    continue;
+                if (targetTransform.gameObject.IsLine())
+                    continue;
 
-                    // Center the camera
-                    CameraController camScript = Camera.main.GetComponent<CameraController>();
-                    camScript.SetTarget(model);
-                    camScript.CenterImmediate();
+                // Instantiate the corresponding GameObject in the container
+                GameObject model = Instantiate(targetTransform.gameObject, prefabContainer.transform, true);
+                model.name = targetTransform.gameObject.name;
+                model.GetComponent<BodyPartVisibility>()?.HideLabels();
+
+                //Destroy all its childrens (labels, lines, etc)
+                foreach (Transform child in model.transform)
+                {
+                    child.GetComponent<BodyPartVisibility>()?.HideLabels();
+                    if(child.gameObject.IsLabel() || child.gameObject.IsLine())
+                        Destroy(child.gameObject);
                 }
 
-            }
-            else
-            {
-                Debug.LogError("Could not find GameObject with the text: " + selectedButton + " inside the skeleton prefab");
+                //Add it to the target list
+                targets.Add(model.name, model);
+
+                // If we want both sides, we do the same for the right one
+                if (left && bothSides)
+                {
+                    targetTransform = globalParent.transform.RecursiveFindChildRaw(bodypart + ".r");
+                    // Instantiate the corresponding GameObject in the container
+                    model = Instantiate(targetTransform.gameObject, prefabContainer.transform, true);
+                    model.name = targetTransform.gameObject.name;
+                    //Destroy all its childrens (labels, lines, etc)
+                    foreach (Transform child in model.transform)
+                        Destroy(child.gameObject);
+                    //Add it to the target list
+                    targets.Add(model.name, model);
+                }
             }
         }
         else
         {
-            Debug.LogError("Could not load skeleton prefab");
+            Debug.LogError("Could not load global prefab");
         }
-    }
-
-
-    // Helper method to recursively search for a GameObject with a specific text in the hierarchy
-    // Helper method to recursively search for a GameObject with a specific text in the hierarchy
-    private Transform FindGameObjectInChildren(Transform parent, string searchText)
-    {
-        // Try to find an exact match
-        Transform result = FindChildByName(parent, searchText);
-        if (result != null)
-        {
-            return result;
-        }
-
-        // Try adding ".g" and search again
-        result = FindChildByName(parent, searchText + ".g");
-        if (result != null)
-        {
-            return result;
-        }
-
-        // Try adding ".l" and search again
-        result = FindChildByName(parent, searchText + ".l");
-        if (result != null)
-        {
-            return result;
-        }
-
-        // Perform a breadth-first search
-        Queue<Transform> queue = new Queue<Transform>();
-        queue.Enqueue(parent);
-
-        while (queue.Count > 0)
-        {
-            Transform current = queue.Dequeue();
-
-            // Check if the current transform name contains the search text
-            if (current.name.Contains(searchText))
-            {
-                return current;
-            }
-
-            for (int i = 0; i < current.childCount; i++)
-            {
-                Transform child = current.GetChild(i);
-                queue.Enqueue(child);
-            }
-        }
-
-        return null;
-    }
-
-
-    // Helper method to find a child GameObject by name
-    private Transform FindChildByName(Transform parent, string name)
-    {
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            Transform child = parent.GetChild(i);
-            if (child.name == name)
-            {
-                return child;
-            }
-        }
-        return null;
-    }
-
-
-
-
-
-    // Helper method to get the scale factor for a given container and object
-    // Helper method to get the scale factor for a given container and object
-    private float GetScaleFactor(GameObject container, GameObject obj)
-    {
-        // Get the bounds of the object
-        Bounds objBounds = GetBounds(obj);
-
-        // Get the bounds of the container
-        Bounds containerBounds = GetBounds(container);
-
-        // Calculate the scale factor
-        float scaleFactor = containerBounds.size.magnitude / Mathf.Max(objBounds.size.x, objBounds.size.y, objBounds.size.z);
-
-        return scaleFactor;
-    }
-
-    // Helper method to get the bounds of a GameObject
-    private Bounds GetBounds(GameObject obj)
-    {
-        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++)
-        {
-            bounds.Encapsulate(renderers[i].bounds);
-        }
-        return bounds;
     }
 }

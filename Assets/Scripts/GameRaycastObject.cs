@@ -184,7 +184,7 @@ public class GameRaycastObject : MonoBehaviour
                 if (labelCollider != null)
                     labelCollider.Clicked();
                 else
-                    bodyPartScript.ObjectClicked();
+                    TangibleLevelManager.Instance.Clicked(bodyPartScript);
 
             }
             objectSelected = null;

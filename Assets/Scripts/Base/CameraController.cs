@@ -430,7 +430,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public void UpdateBounds()
     {
-        bounds = StaticMethods.GetBounds(GlobalVariables.Instance.allBodyParts.Where(it => it.gameObject.activeInHierarchy).Select(it => it.gameObject).ToList());
+        bounds = StaticMethods.GetBounds(GlobalVariables.Instance.allBodyParts.Where(it => it != null && it.gameObject.activeInHierarchy).Select(it => it.gameObject).ToList());
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ public class SystemSwitcher : MonoBehaviour
     public TMP_Text systemTextField;
     public GameObject modelObject;
 
-    private string[] systems = { "Skeleton", "Muscular", "Nervous" };
+    private string[] systems = { "Muscular", "Skeleton", "Nervous" };
     private int currentIndex;
 
     private void Start()

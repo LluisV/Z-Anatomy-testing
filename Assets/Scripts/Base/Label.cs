@@ -33,6 +33,8 @@ public class Label : MonoBehaviour
     private float fontSize;
     [HideInInspector]
     public LabelCollider lc;
+    [HideInInspector]
+    public LabelCollider mirroredLc;
 
     [HideInInspector]
     public TangibleBodyPart parent;
@@ -58,11 +60,14 @@ public class Label : MonoBehaviour
     [HideInInspector]
     public bool invertPlane = false;
     [HideInInspector]
+    public bool mirrored = false;
+    [HideInInspector]
     public float planeOffset = -0.025f;
     [HideInInspector]
     public float inflate = 0.01f;
     private Transform clickableLabelsParent;
     private GameObject colliderGo;
+    private GameObject mirroredColliderGo;
 
 
     private void Awake()
@@ -327,6 +332,8 @@ public class Label : MonoBehaviour
         {
             if (colliderGo != null)
                 DestroyImmediate(colliderGo);
+            if (mirroredColliderGo != null)
+                DestroyImmediate(mirroredColliderGo);
             BuildMesh();
         };
     }
@@ -338,7 +345,7 @@ public class Label : MonoBehaviour
         if(clickableLabelsParent != null)
         {
             if (colliderGo == null)
-                colliderGo = clickableLabelsParent.Find(name + ".col").gameObject;
+                colliderGo = clickableLabelsParent.Find(name + ".col")?.gameObject;
             if (colliderGo != null)
             {
                 EditorApplication.delayCall += () =>
@@ -350,6 +357,16 @@ public class Label : MonoBehaviour
             else
             {
                 Debug.Log("Collider not found");
+            }
+            if (mirroredColliderGo == null)
+                mirroredColliderGo = clickableLabelsParent.Find(name + ".colm")?.gameObject;
+            if (mirroredColliderGo != null)
+            {
+                EditorApplication.delayCall += () =>
+                {
+                    DestroyImmediate(mirroredColliderGo);
+                    AssetDatabase.DeleteAsset(mirroredLc.savePath);
+                };
             }
         }
 
@@ -366,11 +383,14 @@ public class Label : MonoBehaviour
         planeOffset = -0.025f;
         invertPlane = false;
         inflate = 0.01f;
+        mirrored = false;
 
         EditorApplication.delayCall += () =>
         {
             if (colliderGo != null)
             {
+                if(mirroredColliderGo != null)
+                    DestroyImmediate(mirroredColliderGo);
                 DestroyImmediate(colliderGo);
                 BuildMesh();
             }
@@ -381,25 +401,30 @@ public class Label : MonoBehaviour
     {
         if (lc != null)
         {
-            UpdateMeshVariables();
+            UpdateMeshVariables(lc);
             lc.UpdateMaterial();
+        }
+        if(mirroredLc != null)
+        {
+            UpdateMeshVariables(mirroredLc);
+            mirroredLc.UpdateMaterial();
         }
     }
 
-    public void UpdateMeshVariables()
+    public void UpdateMeshVariables(LabelCollider c)
     {
-        if(lc != null)
+        if(c != null)
         {
-            lc.debug = debug;
-            lc.diameter = diameter;
-            lc.offset = offset;
-            lc.angleThresholdEnabled = angleThresholdEnabled;
-            lc.invertAngle = invertAngle;
-            lc.angleThresholdMultiplier = angleThresholdMultiplier;
-            lc.enablePlane = enablePlane;
-            lc.planeOffset = planeOffset;
-            lc.invertPlane = invertPlane;
-            lc.inflate = inflate;
+            c.debug = debug;
+            c.diameter = diameter;
+            c.offset = offset;
+            c.angleThresholdEnabled = angleThresholdEnabled;
+            c.invertAngle = invertAngle;
+            c.angleThresholdMultiplier = angleThresholdMultiplier;
+            c.enablePlane = enablePlane;
+            c.planeOffset = planeOffset;
+            c.invertPlane = invertPlane;
+            c.inflate = inflate;
         }
     }
     private void BuildMesh()
@@ -420,8 +445,21 @@ public class Label : MonoBehaviour
         lc = colliderGo.AddComponent<LabelCollider>();
         lc.label = this;
         lc.parent = clickableLabelsParent;
-        UpdateMeshVariables();
+        UpdateMeshVariables(lc);
         lc.Build();
+
+        if(mirrored)
+        {
+            mirroredColliderGo = new GameObject(name + ".colm");
+            mirroredLc = mirroredColliderGo.AddComponent<LabelCollider>();
+            mirroredLc.label = this;
+            mirroredLc.parent = clickableLabelsParent;
+            UpdateMeshVariables(mirroredLc);
+            mirroredLc.Build();
+            mirroredColliderGo.transform.localScale = new Vector3(-1f, 1f, 1f); // Mirror on the x-axis
+            mirroredColliderGo.transform.position = new Vector3(-colliderGo.transform.position.x, colliderGo.transform.position.y, colliderGo.transform.position.z);
+            mirroredColliderGo.transform.localRotation = Quaternion.identity;
+        }
     }
 }
 
@@ -467,11 +505,15 @@ public class customLabelInspector : Editor
                 label.invertPlane = EditorGUILayout.ToggleLeft("Invert limiting plane", label.invertPlane);
                 label.planeOffset = EditorGUILayout.Slider("Plane offset", label.planeOffset, -0.25f, 0.25f);
             }
-            changes |= EditorGUI.EndChangeCheck();
             GUILayout.Space(10);
-
+            label.mirrored = EditorGUILayout.ToggleLeft("Mirror", label.mirrored);
+            GUILayout.Space(10);
+            changes |= EditorGUI.EndChangeCheck();
             if (changes)
-                label.UpdateMeshVariables();
+            {
+                label.UpdateMeshVariables(label.lc);
+                label.UpdateMeshVariables(label.mirroredLc);
+            }
         }
         
         EditorGUILayout.BeginVertical();

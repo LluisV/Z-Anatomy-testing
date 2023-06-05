@@ -167,15 +167,11 @@ public class LabelCollider : MonoBehaviour
             {
                 // Determine the angle between the face normal and the vector connecting the sphere and the centroid
                 float angle = Mathf.Acos(Vector3.Dot(faceNormal, planeNormal));
-                // Apply a weight factor to give more weight to larger angle differences
-                float weightedAngle = Mathf.Pow(angle, angleThresholdMultiplier);
-                // Normalize the angle to be proportional in the range of 0 to 1
-                float proportionalAngle = weightedAngle / (Mathf.PI / 2f);
-                // Adjust the sphere radius based on the proportional angle
+                float proportionalAngle = Mathf.Pow(angle / Mathf.PI, angleThresholdMultiplier);
                 if(invertAngle)
-                    adjustedRadius = sphereRadius * proportionalAngle;
-                else
                     adjustedRadius = sphereRadius * (1 - proportionalAngle);
+                else
+                    adjustedRadius = sphereRadius * proportionalAngle;
             }
 
             // Check if any of the vertices are inside the  sphere
@@ -340,7 +336,6 @@ public class LabelCollider : MonoBehaviour
         // Assign the new mesh to a MeshFilter component on a new GameObject
 
 
-        Debug.Log("Saved Mesh to:" + savePath);
         AssetDatabase.CreateAsset(intersectingMesh, savePath);
 
         mf.sharedMesh = intersectingMesh;

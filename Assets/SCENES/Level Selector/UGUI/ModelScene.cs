@@ -14,7 +14,43 @@ public class ModelScene : MonoBehaviour
     public GameObject prefabContainer;
     public TextMeshProUGUI selectedText;
     public Dictionary<string, GameObject> targets = new Dictionary<string, GameObject>();
-
+    public static Dictionary<string, List<string>> BodypartList = new Dictionary<string, List<string>>()
+    {
+         { "Carpal bones", new List<string>() {
+      "Scaphoid bone",
+      "Lunate bone",
+      "Triquetrum bone",
+      "Pisiform bone",
+      "Trapezium bone",
+      "Trapezoid bone",
+      "Capitate bone",
+      "Hamate bone"
+    }
+  },
+  { "Phalanges of hand", new List<string>() {
+      "Proximal phalanx of third finger of hand",
+      "Middle phalanx of third finger of hand",
+      "Distal phalanx of third finger of hand",
+      "Sesamoid bones of hand"
+    }
+  },
+  { "Tarsal bones", new List<string>() {
+      "Talus",
+      "Calcaneus",
+      "Navicular bone",
+      "Medial cuneiform bone",
+      "Intermediate cuneiform bone",
+      "Lateral cuneiform bone",
+      "Cuboid bone"
+    }
+  },
+  { "Phalanges of foot", new List<string>() {
+      "Proximal phalanx of third finger of foot",
+      "Middle phalanx of third finger of foot",
+      "Distal phalanx of third finger of foot"
+    }
+  }
+    };
     [Header("Debug options")]
     public bool DEBUG = false;
     public string levelName = string.Empty;
@@ -27,8 +63,8 @@ public class ModelScene : MonoBehaviour
         Instance = this;
 
         List<string> receivedList = bodypartNames.Split(',').ToList();
-
-        if(!DEBUG)
+        
+        if (!DEBUG)
         {
             // Get all the name of all the bodyparts of this level
             string jsonString = PlayerPrefs.GetString("BodypartList");

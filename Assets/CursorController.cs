@@ -5,7 +5,9 @@ using UnityEngine;
 public class CursorController : MonoBehaviour
 {
     public Texture2D cursor;
-    public Texture2D cursorClicked;
+    public Texture2D cursorClickedL;
+    public Texture2D cursorClickedM;
+    public Texture2D cursorClickedR;
 
     private CursorControls controls;
 
@@ -21,29 +23,44 @@ public class CursorController : MonoBehaviour
     controls.Enable();
 }
 
-private void OnDisable()
+    private void OnDisable()
 {
     controls.Disable();
 }
 
-private void Start()
+    private void Start()
 {
-    controls.Mouse.Click.started += _ => StartedClick();
-    controls.Mouse.Click.performed += _ => EndedClick();
-}
+        controls.Mouse.LClick.started   += _ => StartedClickL();
+        controls.Mouse.MClick.started   += _ => StartedClickM();
+        controls.Mouse.RClick.started   += _ => StartedClickR();
+        controls.Mouse.LClick.performed += _ => EndedClick();
+        controls.Mouse.MClick.performed += _ => EndedClick();
+        controls.Mouse.RClick.performed += _ => EndedClick();
+    }
 
-private void StartedClick()
-{
-    ChangeCursor(cursorClicked);
-}
+    private void StartedClickL()
+    {
+        ChangeCursor(cursorClickedL);
+    }
 
-private void EndedClick()
+    private void StartedClickM()
+    {
+        ChangeCursor(cursorClickedM);
+    }
+
+    private void StartedClickR()
+    {
+        ChangeCursor(cursorClickedR);
+    }
+
+
+    private void EndedClick()
 {
     ChangeCursor(cursor);
 }
 
 
-private void ChangeCursor(Texture2D cursorType)
+    private void ChangeCursor(Texture2D cursorType)
     {
         Cursor.SetCursor(cursorType, new Vector2(11, 4), CursorMode.Auto);
     }

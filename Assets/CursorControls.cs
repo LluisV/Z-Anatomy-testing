@@ -28,9 +28,27 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
             ""id"": ""b2e83bd6-aa9b-4c9d-a72b-dc6737a8ab67"",
             ""actions"": [
                 {
-                    ""name"": ""Click"",
+                    ""name"": ""MClick"",
                     ""type"": ""Button"",
                     ""id"": ""413a9daa-3352-4a81-8221-0340a0d29f59"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""1808e270-4005-4760-aa05-49452312d8db"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a08ded0-62c8-419f-bb50-e88704e56ff0"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -41,22 +59,33 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5c7d799c-83c3-42ef-b2db-e7b8688e40b3"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": ""Press(behavior=1)"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Click"",
+                    ""action"": ""MClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""c352980b-0054-4805-83da-027f2f2b6f9c"",
-                    ""path"": ""<Mouse>/middleButton"",
+                    ""id"": ""8188126e-6276-4310-993f-887a88b995a5"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": ""Press(behavior=1)"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Click"",
+                    ""action"": ""RClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eb433a31-3924-40f7-b2de-6f507a935af9"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -67,7 +96,9 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
 }");
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
-        m_Mouse_Click = m_Mouse.FindAction("Click", throwIfNotFound: true);
+        m_Mouse_MClick = m_Mouse.FindAction("MClick", throwIfNotFound: true);
+        m_Mouse_RClick = m_Mouse.FindAction("RClick", throwIfNotFound: true);
+        m_Mouse_LClick = m_Mouse.FindAction("LClick", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -129,12 +160,16 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
     // Mouse
     private readonly InputActionMap m_Mouse;
     private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
-    private readonly InputAction m_Mouse_Click;
+    private readonly InputAction m_Mouse_MClick;
+    private readonly InputAction m_Mouse_RClick;
+    private readonly InputAction m_Mouse_LClick;
     public struct MouseActions
     {
         private @CursorControls m_Wrapper;
         public MouseActions(@CursorControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Click => m_Wrapper.m_Mouse_Click;
+        public InputAction @MClick => m_Wrapper.m_Mouse_MClick;
+        public InputAction @RClick => m_Wrapper.m_Mouse_RClick;
+        public InputAction @LClick => m_Wrapper.m_Mouse_LClick;
         public InputActionMap Get() { return m_Wrapper.m_Mouse; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -144,16 +179,28 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_MouseActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_MouseActionsCallbackInterfaces.Add(instance);
-            @Click.started += instance.OnClick;
-            @Click.performed += instance.OnClick;
-            @Click.canceled += instance.OnClick;
+            @MClick.started += instance.OnMClick;
+            @MClick.performed += instance.OnMClick;
+            @MClick.canceled += instance.OnMClick;
+            @RClick.started += instance.OnRClick;
+            @RClick.performed += instance.OnRClick;
+            @RClick.canceled += instance.OnRClick;
+            @LClick.started += instance.OnLClick;
+            @LClick.performed += instance.OnLClick;
+            @LClick.canceled += instance.OnLClick;
         }
 
         private void UnregisterCallbacks(IMouseActions instance)
         {
-            @Click.started -= instance.OnClick;
-            @Click.performed -= instance.OnClick;
-            @Click.canceled -= instance.OnClick;
+            @MClick.started -= instance.OnMClick;
+            @MClick.performed -= instance.OnMClick;
+            @MClick.canceled -= instance.OnMClick;
+            @RClick.started -= instance.OnRClick;
+            @RClick.performed -= instance.OnRClick;
+            @RClick.canceled -= instance.OnRClick;
+            @LClick.started -= instance.OnLClick;
+            @LClick.performed -= instance.OnLClick;
+            @LClick.canceled -= instance.OnLClick;
         }
 
         public void RemoveCallbacks(IMouseActions instance)
@@ -173,6 +220,8 @@ public partial class @CursorControls: IInputActionCollection2, IDisposable
     public MouseActions @Mouse => new MouseActions(this);
     public interface IMouseActions
     {
-        void OnClick(InputAction.CallbackContext context);
+        void OnMClick(InputAction.CallbackContext context);
+        void OnRClick(InputAction.CallbackContext context);
+        void OnLClick(InputAction.CallbackContext context);
     }
 }

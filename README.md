@@ -11,3 +11,4 @@ All of us here at Z-Anatomy appreciate all medical professionals & students who 
 
 ## Links & Ways to connect.
 * [Z-Anatomy.com](https://www.z-anatomy.com/)
+* Can't open the site? Use this link for downloads: [Z-Anatomy Downloads](https://drive.google.com/drive/folders/1p9Ah2upI6zmeIZE8boIvYkO7xb6U9wE7?usp=sharing)

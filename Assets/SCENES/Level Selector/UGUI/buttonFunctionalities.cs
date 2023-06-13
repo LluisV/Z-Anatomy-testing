@@ -16,15 +16,27 @@ public class buttonFunctionalities : MonoBehaviour
         Debug.Log(buttonText);
 
         // If a button was previously selected, reset its color to its original color
-        if (TestingLoadCSVData.Instance.flag == 1)
+        if (ReadCSVLevels.Instance.flag == 1)
         {
-            TestingLoadCSVData.Instance.lastSelectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+            ReadCSVLevels.Instance.lastSelectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
         }
 
         // Set the color of the current button to yellow
         Button currentButton = buttonGameObject.GetComponent<Button>();
+        TextMeshProUGUI txtScript = currentButton.GetComponentInChildren<TextMeshProUGUI>();
+        txtScript.color = Color.yellow;
 
-        currentButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
+        // Save a reference to the last selected button
+        ReadCSVLevels.Instance.lastSelectedButton = currentButton;
+        ReadCSVLevels.Instance.flag = 1;
+    }
+
+    public void onPlayButtonClick()
+    {
+        TextMeshProUGUI txtScript = ReadCSVLevels.Instance.lastSelectedButton.GetComponentInChildren<TextMeshProUGUI>();
+        // Get the level data
+        levelName = txtScript.text;
+        bodyPartList = ReadCSVLevels.Instance.GetSelectedParts(levelName);
 
         // Convert the list to a JSON string (so we can send it as a string)
         string jsonString = JsonUtility.ToJson(bodyPartList);
@@ -33,14 +45,7 @@ public class buttonFunctionalities : MonoBehaviour
         // Send the level name
         PlayerPrefs.SetString("LevelName", levelName);
 
-        // Save a reference to the last selected button
-        TestingLoadCSVData.Instance.lastSelectedButton = currentButton;
-        TestingLoadCSVData.Instance.flag = 1;
 
-    }
-
-    public void onPlayButtonClick()
-    {
         // Load the "modelscene" scene
         SceneManager.LoadScene("ModelScene");
     }

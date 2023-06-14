@@ -128,6 +128,9 @@ public class Label : MonoBehaviour
     /// </summary>
     public void Initialize()
     {
+        if (GlobalVariables.Instance == null)
+            return;
+
         // Set the box collider center to the center of the text mesh.
         boxCollider.center = Vector3.zero;
         // Store the parent scale value for later use.
@@ -173,6 +176,9 @@ public class Label : MonoBehaviour
     /// <returns>
     void UpdateColor()
     {
+        if (_renderer == null)
+            return;
+
         float angle = Vector3.Angle(originPoint.position - transform.position, -cam.transform.forward);
         float a = angle * angle * angle * angle * 0.000000025f;
         _renderer.enabled = a > .075f;

@@ -38,11 +38,6 @@ public class ReadCSVLevels : MonoBehaviour
     [SerializeField]
     private float spaceBetweenSections = 0;
 
-    [HideInInspector]
-    public int flag = 0;
-    [HideInInspector]
-    public Button lastSelectedButton;
-
     System currentSystem = System.Skeletal;
 
     private void Awake()

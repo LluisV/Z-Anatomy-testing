@@ -14,16 +14,23 @@ public class SerializableList<T>
 
 public class StartLevel : MonoBehaviour
 {
-    SerializableList<string> bodyPartList = new SerializableList<string>();
+    private SerializableList<string> bodyPartList = new SerializableList<string>();
+    private SingleSelectionScrollView scrollView;
+    [HideInInspector]
+    private string selectedLevelName;
+
+    private void Awake()
+    {
+        scrollView = FindObjectOfType<SingleSelectionScrollView>();
+    }
 
     // Start is called before the first frame update
     public void StartLevelClick()
     {
-        TextMeshProUGUI txtScript = ReadCSVLevels.Instance.lastSelectedButton.GetComponentInChildren<TextMeshProUGUI>();
+        selectedLevelName = scrollView.selectedButton.GetComponentInChildren<TextMeshProUGUI>().text;
         // Get the level data
-        string levelName = txtScript.text;
         bodyPartList.list.Clear();
-        foreach (var part in ReadCSVLevels.Instance.GetSelectedParts(levelName)) {
+        foreach (var part in ReadCSVLevels.Instance.GetSelectedParts(selectedLevelName)) {
             bodyPartList.list.Add(part);
         }
 
@@ -35,15 +42,14 @@ public class StartLevel : MonoBehaviour
             // Send the list
             PlayerPrefs.SetString("BodypartList", jsonString);
             // Send the level name
-            PlayerPrefs.SetString("LevelName", levelName);
+            PlayerPrefs.SetString("LevelName", selectedLevelName);
             // Load the "modelscene" scene
             SceneManager.LoadScene("ModelScene");
         }
         else
         {
-            // TODO: Tangible level
+            PlayerPrefs.SetString("LevelName", selectedLevelName);
+            SceneManager.LoadScene("Label level");
         }
-
     }
-
 }

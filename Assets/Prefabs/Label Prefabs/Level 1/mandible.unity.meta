@@ -1,5 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Prefabs/Label Prefabs/Level 1/mandible.unity.meta
 guid: 6b33bffb8fe36c148bc56f2a6755fbcb
+========
+guid: d74f4a66ad061264d9cd479ed6d5a38d
+folderAsset: yes
+>>>>>>>> Branch-4:Assets/Prefabs/Label Prefabs/Level 1.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

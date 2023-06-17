@@ -7,6 +7,7 @@ using UnityEditor.PackageManager;
 using static UnityEngine.GraphicsBuffer;
 using System.Linq;
 using UnityEditor;
+using System;
 
 public class LabelLevelManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class LabelLevelManager : MonoBehaviour
     public GameObject tangibleBodyPart;
     public int deadline;
     public float hintTime;
+    public Transform container;
 
     private Slider time_slider;
     private Dictionary<string, List<LabelCollider>> groupedTargets = new Dictionary<string, List<LabelCollider>>();
@@ -34,6 +36,30 @@ public class LabelLevelManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        string bodypart = PlayerPrefs.GetString("LevelName");
+        GameObject go = Resources.Load<GameObject>("Prefabs/Label Prefabs/" + bodypart);
+
+        // It is null, let's try adding .l
+        if (go == null)
+            go = Resources.Load<GameObject>("Prefabs/Label Prefabs/" + bodypart + ".l");
+        // It is null, let's try adding .r
+        if (go == null)
+            go = Resources.Load<GameObject>("Prefabs/Label Prefabs/" + bodypart + ".r");
+        // It is null
+        if (go == null)
+            throw new Exception("Something went wrong loading " + bodypart + ". Check the names");
+
+        GameObject model = Instantiate(go, container.transform, true);
+        model.name = go.gameObject.name;
+
+        //Destroy all its childrens (labels, lines, etc)
+        /*foreach (Transform child in model.transform)
+        {
+            if (!child.gameObject.IsLabel() && !child.gameObject.IsLine())
+                Destroy(child.gameObject);
+        }*/
+
+        tangibleBodyPart = model.GetComponent<TangibleBodyPart>().gameObject;
 
         // Get all colliders
         var allColliders = tangibleBodyPart.GetComponentsInChildren<LabelCollider>();

@@ -15,10 +15,10 @@ public class TMP_TextEventTrigger : MonoBehaviour
 
     private void Update()
     {
-        if (tmpText.text != previousText)
+        /*if (tmpText.text != previousText)
         {
             TestingLoadCSVData.Instance.UpdateData();
             previousText = tmpText.text;
-        }
+        }*/
     }
 }

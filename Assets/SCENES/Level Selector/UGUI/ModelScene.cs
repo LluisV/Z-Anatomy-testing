@@ -14,7 +14,6 @@ public class ModelScene : MonoBehaviour
     public GameObject prefabContainer;
     public TextMeshProUGUI selectedText;
     public Dictionary<string, GameObject> targets = new Dictionary<string, GameObject>();
-
     [Header("Debug options")]
     public bool DEBUG = false;
     public string levelName = string.Empty;
@@ -27,12 +26,12 @@ public class ModelScene : MonoBehaviour
         Instance = this;
 
         List<string> receivedList = bodypartNames.Split(',').ToList();
-
-        if(!DEBUG)
+        
+        if (!DEBUG)
         {
             // Get all the name of all the bodyparts of this level
             string jsonString = PlayerPrefs.GetString("BodypartList");
-            receivedList = JsonUtility.FromJson<List<string>>(jsonString);
+            receivedList = JsonUtility.FromJson<SerializableList<string>>(jsonString).list;
             // Get the level name
             levelName = PlayerPrefs.GetString("LevelName");
         }

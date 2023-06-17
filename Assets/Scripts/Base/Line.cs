@@ -51,6 +51,9 @@ public class Line : MonoBehaviour
 
     private void Start()
     {
+        if (GlobalVariables.Instance == null)
+            return;
+
         initialSize = GlobalVariables.Instance.lineSize / 500;
 
     }

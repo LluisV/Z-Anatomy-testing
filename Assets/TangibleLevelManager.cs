@@ -142,6 +142,9 @@ public class TangibleLevelManager : MonoBehaviour
     // This is a recursive function that checks if we have clicked the current target of his children
     private bool IsCorrect(TangibleBodyPart clicked, Transform parent)
     {
+        if(current_target == null)
+            return false;
+
         // If we have clicked the current target
         if (clicked != null && clicked.name.RemoveSuffix() == current_target.Item1.RemoveSuffix())
             return true;

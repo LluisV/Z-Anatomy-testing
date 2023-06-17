@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Prefabs/Label Prefabs/Level 2.meta
 guid: 753831e31f1164e07bd29e58c7eeb7d1
+========
+guid: d74f4a66ad061264d9cd479ed6d5a38d
+>>>>>>>> origin/occipital:Assets/Prefabs/Label Prefabs/Level 1.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

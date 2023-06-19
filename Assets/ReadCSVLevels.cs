@@ -184,7 +184,7 @@ public class ReadCSVLevels : MonoBehaviour
                 levelOverview = levelOverview.Replace("⋅", ",");
 
                 string[] lines = levelOverview.Split('.');
-                string formattedContent = levelName + "\n\n• " + string.Join("\n• ", lines).Trim();
+                string formattedContent = "\n• " + string.Join("\n• ", lines).Trim();
                 contentText.text = formattedContent;
             }
             else

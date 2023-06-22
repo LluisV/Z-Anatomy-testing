@@ -114,6 +114,36 @@ public class GlobalVariables : MonoBehaviour
         }
     }
 
+    public void GetScripts(GameObject obj)
+    {
+        if (obj != null)
+        {
+            allNameScripts = obj.GetComponentsInChildren<NameAndDescription>(true).ToList();
+            allBodyPartRenderers = obj.GetComponentsInChildren<MeshRenderer>(true).Where(it => it.GetComponent<Label>() == null && it.GetComponent<Line>() == null && !it.gameObject.name.Contains(".g")).ToList();
+            allVisibilityScripts = obj.GetComponentsInChildren<BodyPartVisibility>(true).ToList();
+            allBodyParts = obj.GetComponentsInChildren<TangibleBodyPart>(true).Where(it => it != null).ToList();
+
+            bones = allBodyParts.Where(it => it.CompareTag("Skeleton")).ToList();
+            insertions = allBodyParts.Where(it => it.CompareTag("Insertions")).ToList();
+            joints = allBodyParts.Where(it => it.CompareTag("Joints")).ToList();
+            muscles = allBodyParts.Where(it => it.CompareTag("Muscles")).ToList();
+            lymphs = allBodyParts.Where(it => it.CompareTag("Lymph")).ToList();
+            arteries = allBodyParts.Where(it => it.CompareTag("Arteries")).ToList();
+            veins = allBodyParts.Where(it => it.CompareTag("Veins")).ToList();
+            nerves = allBodyParts.Where(it => it.CompareTag("Nervous")).ToList();
+            viscera = allBodyParts.Where(it => it.CompareTag("Visceral")).ToList();
+            regions = allBodyParts.Where(it => it.CompareTag("BodyParts")).ToList();
+            references = allBodyParts.Where(it => it.CompareTag("References")).ToList();
+
+
+            foreach (Transform section in globalParent.transform)
+                bodySections.Add(section.gameObject);
+        }
+    }
+
+
+
+
 
     private void Start()
     {

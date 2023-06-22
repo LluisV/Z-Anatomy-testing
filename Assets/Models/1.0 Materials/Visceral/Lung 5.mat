@@ -8,7 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Lung 5
-  m_Shader: {fileID: -6465566751694194690, guid: 844b409fcc7c344478a14a18354f6a46, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 844b409fcc7c344478a14a18354f6a46,
+    type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _CLEARCOAT
@@ -97,6 +98,8 @@ Material:
     - _BumpScale: 1
     - _ClearCoatMask: 1
     - _ClearCoatSmoothness: 0
+    - _Coat_Mask: 0
+    - _Coat_Smoothness: 0
     - _Cull: 2
     - _CullMode: 2
     - _CullModeForward: 2

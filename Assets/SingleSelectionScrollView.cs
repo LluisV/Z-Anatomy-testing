@@ -16,7 +16,7 @@ public class SingleSelectionScrollView : MonoBehaviour
             Deselect(btn);
 
         selectedButton = btn;
-        selectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.blue;
+        selectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
     }
 
     public void Deselect(Button btn)

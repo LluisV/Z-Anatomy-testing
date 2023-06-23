@@ -13,6 +13,8 @@ public class ReadCSVLevels : MonoBehaviour
     public static ReadCSVLevels Instance;
     public TextAsset skeletonCSV;
     public TextAsset levelOverviewCSV;
+    public TextAsset difficultyLevelsCSV;
+    public Text difficultyLevelText;
 
     public GameObject contentGameObject;
 
@@ -37,6 +39,7 @@ public class ReadCSVLevels : MonoBehaviour
     private float spaceBetweenSections = 0;
 
     private Dictionary<string, string> levelOverviews = new Dictionary<string, string>();
+    private Dictionary<string, string> levelDifficulties = new Dictionary<string, string>();
 
     private void Awake()
     {
@@ -50,6 +53,7 @@ public class ReadCSVLevels : MonoBehaviour
     void Start()
     {
         LoadLevelOverviews();
+        LoadLevelDifficulties();
         CreateButtons();
     }
 
@@ -64,6 +68,21 @@ public class ReadCSVLevels : MonoBehaviour
                 string levelName = row[0];
                 string levelOverview = row[1];
                 levelOverviews[levelName] = levelOverview;
+            }
+        }
+    }
+
+    private void LoadLevelDifficulties()
+    {
+        List<List<string>> rows = ParseCSV(difficultyLevelsCSV.text);
+
+        foreach (List<string> row in rows)
+        {
+            if (row.Count >= 2)
+            {
+                string levelName = row[0];
+                string levelDifficulty = row[1];
+                levelDifficulties[levelName] = levelDifficulty;
             }
         }
     }
@@ -95,7 +114,6 @@ public class ReadCSVLevels : MonoBehaviour
         return ParseCSV(csvText);
     }
 
-    // Reads the CSV as a string and returns a list of rows with individual strings
     private List<List<string>> ParseCSV(string csvText)
     {
         List<List<string>> rows = new List<List<string>>();
@@ -111,7 +129,6 @@ public class ReadCSVLevels : MonoBehaviour
         return rows;
     }
 
-    // Instantiates a button
     private void CreateButton(bool isTitle, string text)
     {
         GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
@@ -129,12 +146,10 @@ public class ReadCSVLevels : MonoBehaviour
             textScript.fontSize = textSize;
         }
 
-        // Adjust button height to fit the text
         RectTransform buttonRectTransform = newButton.GetComponent<RectTransform>();
         Vector2 txtSize = textScript.GetPreferredValues();
         buttonRectTransform.sizeDelta = new Vector2(buttonRectTransform.sizeDelta.x, txtSize.y);
 
-        // Attach a click listener to the button
         Button buttonComponent = newButton.GetComponent<Button>();
         if (buttonComponent != null)
         {
@@ -165,7 +180,6 @@ public class ReadCSVLevels : MonoBehaviour
         return selectedParts;
     }
 
-    // Adds a vertical space to the level list
     private void AddSpacing()
     {
         GameObject spacing = new GameObject();
@@ -175,12 +189,27 @@ public class ReadCSVLevels : MonoBehaviour
 
     private void OnButtonClick(string levelName)
     {
+        if (levelDifficulties.TryGetValue(levelName, out string levelDifficulty))
+        {
+            if (difficultyLevelText != null)
+            {
+                difficultyLevelText.text = levelDifficulty; // Display the difficulty level
+            }
+            else
+            {
+                Debug.LogWarning("Difficulty Level Text component not assigned.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Difficulty level not found for the selected level.");
+        }
+
         if (levelOverviews.TryGetValue(levelName, out string levelOverview))
         {
             TextMeshProUGUI contentText = contentGameObject.GetComponentInChildren<TextMeshProUGUI>();
             if (contentText != null)
             {
-                // Replace the special character with a comma
                 levelOverview = levelOverview.Replace("⋅", ",");
 
                 string[] lines = levelOverview.Split('.');
@@ -193,6 +222,4 @@ public class ReadCSVLevels : MonoBehaviour
             }
         }
     }
-
-
 }

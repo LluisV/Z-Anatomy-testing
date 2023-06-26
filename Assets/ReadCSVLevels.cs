@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Text;
 using System;
 using CsvHelper;
+using UnityEditor;
 
 public class ReadCSVLevels : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class ReadCSVLevels : MonoBehaviour
     [Range(0, 15)]
     [SerializeField]
     private float spaceBetweenSections = 0;
+
+    [SerializeField]
+    private SingleSelectionScrollView scrollView;
 
     private Dictionary<string, string> levelOverviews = new Dictionary<string, string>();
     private Dictionary<string, string> levelDifficulties = new Dictionary<string, string>();
@@ -135,15 +139,24 @@ public class ReadCSVLevels : MonoBehaviour
         var textScript = newButton.GetComponentInChildren<TextMeshProUGUI>();
         textScript.text = text;
 
+
         if (isTitle)
         {
             textScript.fontStyle = FontStyles.Bold | FontStyles.Underline;
             textScript.fontSize = titleTextSize;
+            textScript.color = scrollView.normalColor;
         }
         else
         {
             textScript.GetComponent<RectTransform>().offsetMin += new Vector2(horizontalSpacing, 0);
             textScript.fontSize = textSize;
+            textScript.color = scrollView.normalColor;
+            string prefabPath = "Prefabs/Label Prefabs/" + text;
+            GameObject go = Resources.Load<GameObject>(prefabPath);
+            bool exists = go != null;
+            if (!exists)
+                textScript.color = scrollView.disabledColor;
+
         }
 
         RectTransform buttonRectTransform = newButton.GetComponent<RectTransform>();
@@ -153,7 +166,7 @@ public class ReadCSVLevels : MonoBehaviour
         Button buttonComponent = newButton.GetComponent<Button>();
         if (buttonComponent != null)
         {
-            buttonComponent.onClick.AddListener(() => OnButtonClick(text));
+            buttonComponent.onClick.AddListener(() => OnButtonClick(buttonComponent, text));
         }
     }
     public List<string> GetSelectedParts(string title)
@@ -187,8 +200,11 @@ public class ReadCSVLevels : MonoBehaviour
         spacing.AddComponent<RectTransform>().SetHeight(spaceBetweenSections);
     }
 
-    private void OnButtonClick(string levelName)
+    private void OnButtonClick(Button btn, string levelName)
     {
+        if (btn.GetComponentInChildren<TextMeshProUGUI>().color == scrollView.disabledColor)
+            return;
+
         if (levelDifficulties.TryGetValue(levelName, out string levelDifficulty))
         {
             if (difficultyLevelText != null)

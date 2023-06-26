@@ -8,20 +8,24 @@ public class SingleSelectionScrollView : MonoBehaviour
 {
     [HideInInspector]
     public Button selectedButton;
-
+    public Color normalColor = Color.white;
+    public Color selectedColor = Color.yellow;
+    public Color disabledColor = Color.gray;
 
     public void Select(Button btn)
     {
+        if (btn.GetComponentInChildren<TextMeshProUGUI>().color == disabledColor)
+            return;
+
         if (selectedButton != null)
-            Deselect(btn);
+            Deselect(selectedButton);
 
         selectedButton = btn;
-        selectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
+        selectedButton.GetComponentInChildren<TextMeshProUGUI>().color = selectedColor;
     }
 
     public void Deselect(Button btn)
     {
-        selectedButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+        btn.GetComponentInChildren<TextMeshProUGUI>().color = normalColor;
     }
-
 }

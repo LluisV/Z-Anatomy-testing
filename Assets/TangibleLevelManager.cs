@@ -97,15 +97,13 @@ public class TangibleLevelManager : MonoBehaviour
         //Show the hint light
         if (time_slider.value <= hintTime)
         {
-            // Disabled
-            return;
             //TODO: Show two lights if needed
-            hint_light.transform.position = current_target.Item2[0].transform.position;
+            /*hint_light.transform.position = current_target.Item2[0].transform.position;
             float t = 1 - time_slider.value / hintTime; // 0 to 1
             float hintSpeed = 10f * t;
             float hintIntensity = 0.004f;
             float intensity = Mathf.Abs(Mathf.Sin(t * Mathf.PI * 2 * hintSpeed)) * hintIntensity;
-            hint_light.intensity = intensity;
+            hint_light.intensity = intensity;*/
         }
         else
             hint_light.intensity = 0f;

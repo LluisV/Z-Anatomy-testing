@@ -240,6 +240,8 @@ public class ScrollViewSample : MonoBehaviour
             // Add space between sections
            // AddSpacing();
         }
+
+        UpdateAllButtonNavigationalReferences();
     }
 
     private List<List<string>> GetRows()

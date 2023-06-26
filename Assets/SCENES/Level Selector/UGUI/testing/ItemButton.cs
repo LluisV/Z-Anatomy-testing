@@ -19,7 +19,9 @@ public class ItemButton : MonoBehaviour, ISelectHandler, IPointerClickHandler, I
     public string ItemNameValue { get => _itemName.text; set => _itemName.text = value; }
 
     public void OnPointerClick(PointerEventData eventData) { _onClickEvent.Invoke(this); }
-    public void OnSelect(BaseEventData eventData) { _onSelectEvent.Invoke(this); }
+    public void OnSelect(BaseEventData eventData) { 
+        _onSelectEvent.Invoke(this); 
+    }
     public void OnSubmit(BaseEventData eventData) { _onSubmitEvent.Invoke(this); }
 
     public void ObtainSelectionFocus()

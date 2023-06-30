@@ -1,22 +1,23 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using static System.Collections.Specialized.BitVector32;
-using static UnityEngine.Rendering.DebugUI.Table;
+using System.Text;
+using System;
+using CsvHelper;
+using UnityEditor;
 
 public class ReadCSVLevels : MonoBehaviour
 {
-    enum System
-    {
-        Skeletal
-    }
-
     public static ReadCSVLevels Instance;
     public TextAsset skeletonCSV;
+    public TextAsset levelOverviewCSV;
+    public TextAsset difficultyLevelsCSV;
+    public Text difficultyLevelText;
+
+    public GameObject contentGameObject;
 
     [SerializeField]
     private GameObject buttonPrefab;
@@ -38,7 +39,11 @@ public class ReadCSVLevels : MonoBehaviour
     [SerializeField]
     private float spaceBetweenSections = 0;
 
-    System currentSystem = System.Skeletal;
+    [SerializeField]
+    private SingleSelectionScrollView scrollView;
+
+    private Dictionary<string, string> levelOverviews = new Dictionary<string, string>();
+    private Dictionary<string, string> levelDifficulties = new Dictionary<string, string>();
 
     private void Awake()
     {
@@ -51,19 +56,50 @@ public class ReadCSVLevels : MonoBehaviour
 
     void Start()
     {
+        LoadLevelOverviews();
+        LoadLevelDifficulties();
         CreateButtons();
+    }
+
+    private void LoadLevelOverviews()
+    {
+        List<List<string>> rows = ParseCSV(levelOverviewCSV.text);
+
+        foreach (List<string> row in rows)
+        {
+            if (row.Count >= 2)
+            {
+                string levelName = row[0];
+                string levelOverview = row[1];
+                levelOverviews[levelName] = levelOverview;
+            }
+        }
+    }
+
+    private void LoadLevelDifficulties()
+    {
+        List<List<string>> rows = ParseCSV(difficultyLevelsCSV.text);
+
+        foreach (List<string> row in rows)
+        {
+            if (row.Count >= 2)
+            {
+                string levelName = row[0];
+                string levelDifficulty = row[1];
+                levelDifficulties[levelName] = levelDifficulty;
+            }
+        }
     }
 
     private void CreateButtons()
     {
-
         List<List<string>> rows = GetRows();
 
         // For each row
         foreach (List<string> row in rows)
         {
             // For each column, create 
-            for(int i = 0; i <  row.Count; i++)
+            for (int i = 0; i < row.Count; i++)
             {
                 // The first column is the title
                 bool isTitle = i == 0;
@@ -77,25 +113,11 @@ public class ReadCSVLevels : MonoBehaviour
 
     private List<List<string>> GetRows()
     {
-        TextAsset csv;
-
-        // Select the csv corresponding to the current system
-        switch (currentSystem)
-        {
-            case System.Skeletal:
-                csv = skeletonCSV;
-                break;
-            default:
-                csv = skeletonCSV;
-                break;
-        }
-
-        // Get rows
+        TextAsset csv = skeletonCSV;
         string csvText = csv.text;
         return ParseCSV(csvText);
     }
 
-    // Reads the CSV as a string and returs a list bidimensional matrix of individual strings
     private List<List<string>> ParseCSV(string csvText)
     {
         List<List<string>> rows = new List<List<string>>();
@@ -111,56 +133,57 @@ public class ReadCSVLevels : MonoBehaviour
         return rows;
     }
 
-    // Instantiates a button
     private void CreateButton(bool isTitle, string text)
     {
         GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
         var textScript = newButton.GetComponentInChildren<TextMeshProUGUI>();
         textScript.text = text;
 
+
         if (isTitle)
         {
             textScript.fontStyle = FontStyles.Bold | FontStyles.Underline;
             textScript.fontSize = titleTextSize;
+            textScript.color = scrollView.normalColor;
         }
         else
         {
             textScript.GetComponent<RectTransform>().offsetMin += new Vector2(horizontalSpacing, 0);
             textScript.fontSize = textSize;
+            textScript.color = scrollView.normalColor;
+            string prefabPath = "Prefabs/Label Prefabs/" + text;
+            GameObject go = Resources.Load<GameObject>(prefabPath);
+            bool exists = go != null;
+            if (!exists)
+                textScript.color = scrollView.disabledColor;
+
         }
 
-        // Adjust button height to fit the text
         RectTransform buttonRectTransform = newButton.GetComponent<RectTransform>();
         Vector2 txtSize = textScript.GetPreferredValues();
         buttonRectTransform.sizeDelta = new Vector2(buttonRectTransform.sizeDelta.x, txtSize.y);
 
+        Button buttonComponent = newButton.GetComponent<Button>();
+        if (buttonComponent != null)
+        {
+            buttonComponent.onClick.AddListener(() => OnButtonClick(buttonComponent, text));
+        }
     }
-
-    // Adds a vertical space to the level list
-    private void AddSpacing()
-    {
-        GameObject spacing = new GameObject();
-        spacing.transform.parent = buttonParent.transform;
-        spacing.AddComponent<RectTransform>().SetHeight(spaceBetweenSections);
-    }
-
-
-    // Get the list of the 
     public List<string> GetSelectedParts(string title)
     {
         List<List<string>> rows = GetRows();
         List<string> selectedParts = new List<string>();
 
         // Iterate over the rows
-        for (int i = 0; i < rows.Count; i++)
+        foreach (List<string> row in rows)
         {
             // Check if the title column matches the given title
-            if (rows[i].Count > 0 && rows[i][0] == title)
+            if (row.Count > 0 && row[0] == title)
             {
                 // Add the remaining columns to the selectedParts list
-                for (int j = 1; j < rows[i].Count; j++)
+                for (int j = 1; j < row.Count; j++)
                 {
-                    selectedParts.Add(rows[i][j]);
+                    selectedParts.Add(row[j]);
                 }
 
                 break; // Exit the loop since we found the matching title
@@ -170,4 +193,49 @@ public class ReadCSVLevels : MonoBehaviour
         return selectedParts;
     }
 
+    private void AddSpacing()
+    {
+        GameObject spacing = new GameObject();
+        spacing.transform.parent = buttonParent.transform;
+        spacing.AddComponent<RectTransform>().SetHeight(spaceBetweenSections);
+    }
+
+    private void OnButtonClick(Button btn, string levelName)
+    {
+        if (btn.GetComponentInChildren<TextMeshProUGUI>().color == scrollView.disabledColor)
+            return;
+
+        if (levelDifficulties.TryGetValue(levelName, out string levelDifficulty))
+        {
+            if (difficultyLevelText != null)
+            {
+                difficultyLevelText.text = levelDifficulty; // Display the difficulty level
+            }
+            else
+            {
+                Debug.LogWarning("Difficulty Level Text component not assigned.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Difficulty level not found for the selected level.");
+        }
+
+        if (levelOverviews.TryGetValue(levelName, out string levelOverview))
+        {
+            TextMeshProUGUI contentText = contentGameObject.GetComponentInChildren<TextMeshProUGUI>();
+            if (contentText != null)
+            {
+                levelOverview = levelOverview.Replace("⋅", ",");
+
+                string[] lines = levelOverview.Split('.');
+                string formattedContent = "\n• " + string.Join("\n• ", lines).Trim();
+                contentText.text = formattedContent;
+            }
+            else
+            {
+                Debug.LogWarning("TextMeshProUGUI component not found in the children of the assigned GameObject.");
+            }
+        }
+    }
 }

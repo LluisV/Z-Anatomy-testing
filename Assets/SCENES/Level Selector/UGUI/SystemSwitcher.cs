@@ -16,20 +16,27 @@ public class SystemSwitcher : MonoBehaviour
     private void Start()
     {
         currentIndex = 0;
-        LoadSelectedPrefab();
-
+        if(systemTextField.text == "")
+        {
+            systemTextField.text = "Skeleton";
+            LoadSelectedPrefab();
+        }
     }
 
     private void LoadSelectedPrefab()
     {
         string selectedButton = systemTextField.text;
+        LoadPrefab(selectedButton);
+    }
 
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/" + selectedButton);
+    private void LoadPrefab(string modelName)
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/" + modelName);
 
         if (prefab != null)
         {
             DestroyCurrentModel(); // Destroy the previous model before loading the new one
-
+            
             GameObject model = Instantiate(prefab, prefabContainer.transform);
             modelObject = model;
             model.transform.SetParent(prefabContainer.transform);
@@ -42,21 +49,23 @@ public class SystemSwitcher : MonoBehaviour
             Vector3 modelSize = GetBounds(model).size;
             float scaleFactor = Mathf.Min(containerSize.x / modelSize.x, containerSize.y / modelSize.y, containerSize.z / modelSize.z);
             model.transform.localScale *= scaleFactor;
+            GlobalVariables.Instance.GetScripts(model);
+            CrossSectionsAnimation.Instance.SetMaterial(model.tag, true);
         }
         else
         {
-            Debug.LogError("Could not load prefab: " + selectedButton);
+            Debug.LogError("Could not load prefab: " + modelName);
         }
+
     }
 
 
 
     private void DestroyCurrentModel()
     {
-        int childCount = prefabContainer.transform.childCount;
-        for (int i = childCount - 1; i >= 0; i--)
+        foreach (Transform child in prefabContainer.transform)
         {
-            Destroy(prefabContainer.transform.GetChild(i).gameObject);
+            Destroy(child.gameObject);
         }
     }
     private void DestroyHumanBodyModel()

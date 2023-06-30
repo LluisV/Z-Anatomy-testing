@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CrossSectionPlane : MonoBehaviour
 {
-    public MeshManagement meshManagement;
     public string planePos;
     public string planeNormal;
 

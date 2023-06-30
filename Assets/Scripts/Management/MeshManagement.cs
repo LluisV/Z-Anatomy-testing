@@ -63,7 +63,7 @@ public class MeshManagement : MonoBehaviour
         foreach (var item in GlobalVariables.Instance.globalParent.GetComponentsInChildren<BodyPartVisibility>(true))
             GetInsertionsInChild(item);
 
-        SelectedObjectsManagement.Instance.GetActiveObjects();
+        SelectedObjectsManagement.Instance?.GetActiveObjects();
     }
 
     private void GetInsertionsInChild(BodyPartVisibility visibilityScript)

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
@@ -9,16 +9,16 @@ using System;
 using CsvHelper;
 using UnityEditor;
 
-public class ReadCSVLevels : MonoBehaviour
+public class OldReadCSVLevels : MonoBehaviour
 {
-    public static ReadCSVLevels Instance;
+    public static OldReadCSVLevels Instance;
     public TextAsset skeletonCSV;
     public TextAsset levelOverviewCSV;
     public TextAsset difficultyLevelsCSV;
     public Text difficultyLevelText;
 
     public GameObject contentGameObject;
-/*
+
     [SerializeField]
     private GameObject buttonPrefab;
     [SerializeField]
@@ -38,24 +38,22 @@ public class ReadCSVLevels : MonoBehaviour
     [Range(0, 15)]
     [SerializeField]
     private float spaceBetweenSections = 0;
-*/
+
     [SerializeField]
     private SingleSelectionScrollView scrollView;
 
     private Dictionary<string, string> levelOverviews = new Dictionary<string, string>();
     private Dictionary<string, string> levelDifficulties = new Dictionary<string, string>();
 
-  
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
         }
-        //buttonParent.GetComponent<VerticalLayoutGroup>().spacing = verticalSpacing;
+        buttonParent.GetComponent<VerticalLayoutGroup>().spacing = verticalSpacing;
     }
 
-    
     void Start()
     {
         LoadLevelOverviews();
@@ -63,7 +61,7 @@ public class ReadCSVLevels : MonoBehaviour
         CreateButtons();
     }
 
-    public void LoadLevelOverviews()
+    private void LoadLevelOverviews()
     {
         List<List<string>> rows = ParseCSV(levelOverviewCSV.text);
 
@@ -93,7 +91,7 @@ public class ReadCSVLevels : MonoBehaviour
         }
     }
 
-    public void CreateButtons()
+    private void CreateButtons()
     {
         List<List<string>> rows = GetRows();
 
@@ -104,18 +102,13 @@ public class ReadCSVLevels : MonoBehaviour
             for (int i = 0; i < row.Count; i++)
             {
                 // The first column is the title
-                if (i == 0)
-                    ScrollViewSample.Instance.CreateItemHeading(row[i]);
-                else
-                    ScrollViewSample.Instance.CreateItem(row[i]);
-
+                bool isTitle = i == 0;
+                CreateButton(isTitle, row[i]);
             }
 
             // Add space between sections
-            // AddSpacing();
+            AddSpacing();
         }
-
-        ScrollViewSample.Instance.UpdateAllButtonNavigationalReferences();
     }
 
     private List<List<string>> GetRows()
@@ -140,7 +133,7 @@ public class ReadCSVLevels : MonoBehaviour
         return rows;
     }
 
-/*    private void CreateButton(bool isTitle, string text)
+    private void CreateButton(bool isTitle, string text)
     {
         GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
         var textScript = newButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -176,7 +169,6 @@ public class ReadCSVLevels : MonoBehaviour
             buttonComponent.onClick.AddListener(() => OnButtonClick(buttonComponent, text));
         }
     }
-*/
     public List<string> GetSelectedParts(string title)
     {
         List<List<string>> rows = GetRows();
@@ -200,14 +192,13 @@ public class ReadCSVLevels : MonoBehaviour
 
         return selectedParts;
     }
-    /*
+
     private void AddSpacing()
     {
         GameObject spacing = new GameObject();
         spacing.transform.parent = buttonParent.transform;
         spacing.AddComponent<RectTransform>().SetHeight(spaceBetweenSections);
     }
-*/
 
     private void OnButtonClick(Button btn, string levelName)
     {
